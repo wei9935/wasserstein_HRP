@@ -7,18 +7,19 @@ from hierarchy import *
 
 
 def topN_tw(n, start, end):
-    cap = pd.read_excel('mktCap.xlsx')
+    cap = pd.read_excel('data/mktCap.xlsx')
     new_columns = {col: col.split(' ')[0] + '.TW' for col in cap.columns[1:]}
     cap = cap.rename(columns=new_columns)
     Top = pd.to_numeric(cap.iloc[0], errors='coerce').nlargest(n).index.tolist()
     close = yf.download(Top, start=start, end=end)
     close = close.loc[:, ('Adj Close', slice(None))]
     close.columns = close.columns.get_level_values(1)
-
+    close.index = pd.to_datetime(close.index)
+    close = close.dropna(axis=1)
     return close
 
 def topN_us(n, start, end):
-    us_stocks = pd.read_csv('usStockCAP_2023_12.csv')
+    us_stocks = pd.read_csv('data/usStockCAP_2023_12.csv')
     Top = us_stocks['Symbol'][0:n].tolist()
     Top.sort()
     close = yf.download(Top, start=start, end=end)
@@ -171,9 +172,8 @@ def performance_metric(portfolio_df, rf_df):
 
 def plot_series(df, save_path=None):
     plt.figure(figsize=(10, 6))
-    line = ['--', '-', '-.', ':']
-    for i, column in enumerate(df.columns):
-        plt.plot(df.index, df[column], label=column, linestyle=line[i])
+    for column in df.columns:
+        plt.plot(df.index, df[column], label=column)
 
     plt.xlabel('Time'), plt.ylabel('Value')
     quarters = pd.date_range(start=df.index.min(), end=df.index.max(), freq='6M')
@@ -181,12 +181,13 @@ def plot_series(df, save_path=None):
     plt.xticks(quarters, quarter_labels)
     plt.xticks(rotation=45)
     plt.legend()
+    plt.grid(axis='y', color='gray', alpha=0.15)
 
     if save_path is not None:
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
         print(f"Plot saved to {save_path}")
 
-    plt.show()
+    #plt.show()
 
 
 

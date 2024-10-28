@@ -15,13 +15,13 @@ us_ret = us_price.pct_change().dropna()#['2022-01-01':'2024-01-01']
 whc = wasserstein_HC(us_ret.T, method='average')
 whc.fit()
 w_link = whc.linkage_matrix
-whc.plt_dendrogram('Results/wass_hierarchy_plot')
+whc.plt_dendrogram('results/wass_hierarchy_plot')
 
 # with euclidean distance
 hc = HierarchicalClutering(us_ret.T, method='average')
 hc.fit()
 hc_link = hc.linkage_matrix
-hc.plt_dendrogram('Results/hierarchy_plot')
+hc.plt_dendrogram('results/hierarchy_plot')
 
 
 # Backtest
@@ -37,11 +37,11 @@ for roll in rolling_window:
         val_list.append(val[0])
 
     val_df = pd.DataFrame(data=dict(zip(methods, val_list)))
-    plot_series(val_df, save_path = f'Results/us performance_plot_{roll}M')
+    plot_series(val_df, save_path = f'results/us performance_plot_{roll}M')
 
-    rf = pd.read_csv('US_risk_free_rate.csv', index_col='Date')
+    rf = pd.read_csv('data/US_risk_free_rate.csv', index_col='Date')
     us_perf = performance_metric(val_df, rf)
-    us_perf.to_csv(f'Results/us_performance_{roll}M.csv')
+    us_perf.to_csv(f'results/us_performance_{roll}M.csv')
 
     # TW
     val_list = []
@@ -51,8 +51,8 @@ for roll in rolling_window:
         val_list.append(val[0])
 
     val_df = pd.DataFrame(data=dict(zip(methods, val_list)))
-    plot_series(val_df, save_path=f'Results/tw performace plot_{roll}M')
+    plot_series(val_df, save_path=f'results/tw performace plot_{roll}M')
 
-    rf = pd.read_csv('TW_risk_free_rate.csv', index_col='Date')
+    rf = pd.read_csv('data/TW_risk_free_rate.csv', index_col='Date')
     tw_perf = performance_metric(val_df, rf)
-    tw_perf.to_csv(f'Results/tw_performance_{roll}M.csv')
+    tw_perf.to_csv(f'results/tw_performance_{roll}M.csv')
